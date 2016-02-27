@@ -1,27 +1,22 @@
 import javax.swing.JFrame;
 
-public class GameWindows
-{
+public class GameWindow {
 	JFrame frame;
-	JPanelWindows panel;
+	GamePanel panel;
 
-	public static void main(String[] args)
-	{
-		GameWindows w = new GameWindows();
+	public static void main(String[] args) {
+		GameWindow w = new GameWindow();
 		w.createUI();
 
 	}
 
-	public void createUI()
-	{
+	public void createUI() {
 		frame = new JFrame();
 		frame.setVisible(true);
-		panel = new JPanelWindows();
+		panel = new GamePanel();
 		frame.add(panel);
 		frame.setSize(500, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		;
 	}
 
 }
-Status API Training Shop Blog About Pricing
