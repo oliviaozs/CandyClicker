@@ -1,50 +1,104 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.colorchooser.ColorSelectionModel;
 
 public class GamePanel extends JPanel implements ActionListener {
 	Timer t;
-	BufferedImage image;
-	BufferedImage enemyImage;
-	BufferedImage playerImage;
-	GameObject player;
-	GameObject enemy;
+	Color randomColor;
+	public static int latestID;
+	int random;
+	int highlightedCandy;
+	int counter = 1;
+	long startTime = -1;
+
+	BufferedImage blueImage;
+	BufferedImage greenImage;
+	BufferedImage orangeImage;
+	BufferedImage redImage;
+
+	GameObject greenCandy;
+	GameObject blueCandy;
+	GameObject orangeCandy;
+	GameObject redCandy;
+
 	ArrayList<GameObject> objects;
+	ArrayList<Integer> randomNums;
 
 	public GamePanel() {
-		
+		randomNums = new ArrayList<Integer>();
+		random = new Random().nextInt(4);
+		randomNums.add(random);
+		highlightedCandy = random;
+		random = new Random().nextInt(4);
+		randomNums.add(random);
+		random = new Random().nextInt(4);
+
+		randomNums.add(random);
 		try {
-			enemyImage = ImageIO.read(this.getClass().getResourceAsStream("raincloud.jpg"));
-			playerImage = ImageIO.read(this.getClass().getResourceAsStream("bird.jpg"));
+			blueImage = ImageIO.read(this.getClass().getResourceAsStream("blue.png"));
+			greenImage = ImageIO.read(this.getClass().getResourceAsStream("green.png"));
+			orangeImage = ImageIO.read(this.getClass().getResourceAsStream("orange.png"));
+			redImage = ImageIO.read(this.getClass().getResourceAsStream("red.png"));
 		} catch (Exception e) {
 			System.out.println("ERROR");
 		}
-		
-		player = new Player(0,0,100,100, playerImage);
-		enemy = new Enemy(100, 100, 100, 100, enemyImage);
-		
+
+		greenCandy = new Player(50, 50, 150, 150, greenImage, 0);
+		blueCandy = new Player(300, 50, 150, 150, blueImage, 1);
+		orangeCandy = new Player(50, 250, 150, 150, orangeImage, 2);
+		redCandy = new Player(300, 250, 150, 150, redImage, 3);
+
 		objects = new ArrayList<GameObject>();
-		objects.add(player);
-		objects.add(enemy);
-		
+		objects.add(greenCandy);
+		objects.add(blueCandy);
+		objects.add(orangeCandy);
+		objects.add(redCandy);
+
 		t = new Timer(1000 / 60, this);
 		t.start();
 	}
 
 	public void paintComponent(Graphics g) {
-		for (GameObject go: objects){
+		g.setColor(randomColor);
+		if (highlightedCandy == 0) {
+			g.fillRect(0, 0, 250, 250);
+		} else if (highlightedCandy == 1) {
+			g.fillRect(250, 0, 250, 250);
+		} else if (highlightedCandy == 2) {
+			g.fillRect(0, 250, 250, 250);
+		} else if (highlightedCandy == 3) {
+			g.fillRect(250, 250, 250, 250);
+		}
+		for (GameObject go : objects) {
 			go.paintComponent(g);
 		}
 	}
-	
-	public void update(){
-		for(GameObject go: objects){
+
+	public void update() {
+		if (startTime == -1) {
+			startTime = System.currentTimeMillis();
+
+		}
+		if (System.currentTimeMillis() - startTime >= 1000) {
+			if (counter < randomNums.size()) {
+				randomColor = Utilities.getRandomColor();
+				highlightedCandy = randomNums.get(counter++);
+				startTime = -1;
+			}
+
+		}
+		for (GameObject go : objects) {
 			go.update();
 		}
 	}
@@ -53,6 +107,39 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		update();
 		repaint();
+	}
+
+	public void mouseClicked(MouseEvent e) {
+		blueCandy.mouseClicked(e);
+		greenCandy.mouseClicked(e);
+		orangeCandy.mouseClicked(e);
+		redCandy.mouseClicked(e);
+		if (random == latestID) {
+			System.out.println("test");
+			random = new Random().nextInt(4);
+			randomNums.add(random);
+		}
+
+	}
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
