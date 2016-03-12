@@ -21,7 +21,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int highlightedCandy;
 	int counter = 1;
 	long startTime = -1;
-
+	int index = 0;
+	
 	BufferedImage blueImage;
 	BufferedImage greenImage;
 	BufferedImage orangeImage;
@@ -43,8 +44,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		random = new Random().nextInt(4);
 		randomNums.add(random);
 		random = new Random().nextInt(4);
-
 		randomNums.add(random);
+		
 		try {
 			blueImage = ImageIO.read(this.getClass().getResourceAsStream("blue.png"));
 			greenImage = ImageIO.read(this.getClass().getResourceAsStream("green.png"));
@@ -54,10 +55,10 @@ public class GamePanel extends JPanel implements ActionListener {
 			System.out.println("ERROR");
 		}
 
-		greenCandy = new Player(50, 50, 150, 150, greenImage, 0);
-		blueCandy = new Player(300, 50, 150, 150, blueImage, 1);
-		orangeCandy = new Player(50, 250, 150, 150, orangeImage, 2);
-		redCandy = new Player(300, 250, 150, 150, redImage, 3);
+		greenCandy = new Candy(50, 50, 150, 150, greenImage, 0);
+		blueCandy = new Candy(300, 50, 150, 150, blueImage, 1);
+		orangeCandy = new Candy(50, 250, 150, 150, orangeImage, 2);
+		redCandy = new Candy(300, 250, 150, 150, redImage, 3);
 
 		objects = new ArrayList<GameObject>();
 		objects.add(greenCandy);
@@ -95,7 +96,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				randomColor = Utilities.getRandomColor();
 				highlightedCandy = randomNums.get(counter++);
 				startTime = -1;
-			}
+			} 
 
 		}
 		for (GameObject go : objects) {
@@ -114,10 +115,13 @@ public class GamePanel extends JPanel implements ActionListener {
 		greenCandy.mouseClicked(e);
 		orangeCandy.mouseClicked(e);
 		redCandy.mouseClicked(e);
-		if (random == latestID) {
-			System.out.println("test");
-			random = new Random().nextInt(4);
-			randomNums.add(random);
+		if (index < randomNums.size()) {
+			if (latestID == randomNums.get(index++)) {
+				System.out.println("correct candy clicked");
+			} else {
+				System.out.println("wrong candy clicked");
+			}
+			
 		}
 
 	}
