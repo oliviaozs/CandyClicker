@@ -14,7 +14,7 @@ public class GameWindow implements MouseListener {
 	}
 
 	public void createUI() {
-		frame = new JFrame();
+		frame = new JFrame("repeat the pattern!");
 		frame.addMouseListener(this);
 		panel = new GamePanel();
 		frame.add(panel);

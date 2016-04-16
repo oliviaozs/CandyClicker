@@ -2,12 +2,25 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class Candy extends GameObject {
+import javax.swing.JButton;
+
+public class Candy extends JButton {
 	int id;
+	int x;
+	int y;
+	int width;
+	int height;
+	BufferedImage picture;
 
 	public Candy(int x, int y, int w, int h, BufferedImage p, int id) {
-		super(x, y, w, h, p);
+		super();
+		this.x =x;
+		this.y = y;
+		this.width = w;
+		this.height = h;
+		this.picture = p;
 		this.id = id;
+		setBounds(x,y,width,height);
 	}
 
 	public int getID() {

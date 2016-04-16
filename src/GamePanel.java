@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.colorchooser.ColorSelectionModel;
@@ -16,9 +17,11 @@ import javax.swing.colorchooser.ColorSelectionModel;
 public class GamePanel extends JPanel implements ActionListener {
 	Timer t;
 	Color randomColor;
+	Color highlightColor;
 	public static int latestID;
 	int random;
 	int highlightedCandy;
+	int candyClicked;
 	int counter = 1;
 	long startTime = -1;
 	int index = 0;
@@ -32,12 +35,12 @@ public class GamePanel extends JPanel implements ActionListener {
 	BufferedImage orangeImage;
 	BufferedImage redImage;
 
-	GameObject greenCandy;
-	GameObject blueCandy;
-	GameObject orangeCandy;
-	GameObject redCandy;
+	Candy greenCandy;
+	Candy blueCandy;
+	Candy orangeCandy;
+	Candy redCandy;
 
-	ArrayList<GameObject> objects;
+	ArrayList<Candy> candies;
 	ArrayList<Integer> randomNums;
 
 	public GamePanel() {
@@ -64,11 +67,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		orangeCandy = new Candy(50, 250, 150, 150, orangeImage, 2);
 		redCandy = new Candy(300, 250, 150, 150, redImage, 3);
 
-		objects = new ArrayList<GameObject>();
-		objects.add(greenCandy);
-		objects.add(blueCandy);
-		objects.add(orangeCandy);
-		objects.add(redCandy);
+		candies = new ArrayList<Candy>();
+		candies.add(greenCandy);
+		candies.add(blueCandy);
+		candies.add(orangeCandy);
+		candies.add(redCandy);
 
 		t = new Timer(1000 / 60, this);
 		t.start();
@@ -89,7 +92,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		} else if (currentPhase == inputPhase) {
 			if (guess) {
-				g.setColor(Color.GREEN);
+				g.setColor(highlightColor);
 				if (highlightedCandy == 0) {
 					g.fillRect(0, 0, 250, 250);
 				} else if (highlightedCandy == 1) {
@@ -103,7 +106,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		}
 
-		for (GameObject go : objects) {
+		for (Candy go : candies) {
 			go.paintComponent(g);
 		}
 	}
@@ -115,7 +118,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				startTime = System.currentTimeMillis();
 
 			}
-			if (System.currentTimeMillis() - startTime >= 1000) {
+			if (System.currentTimeMillis() - startTime >= 800) {
 				if (counter < randomNums.size()) {
 
 					randomColor = Utilities.getRandomColor();
@@ -128,12 +131,34 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 		} else if (currentPhase == inputPhase) {
+
+			/*if (startTime == -1) {
+				startTime = System.currentTimeMillis();
+			}
+			if (System.currentTimeMillis() - startTime >= 1000) {
+				highlightedCandy = -1;
+				startTime = -1;
+				if (index >= randomNums.size()) {
+					currentPhase = displayPhase;
+					index = 0;
+				}
+				if (guess) {
+					if (index < randomNums.size()) {
+						highlightedCandy = latestID;
+						startTime = -1;
+					}
+				}
+			}*/
+
 			highlightedCandy = latestID;
+
 		}
 
-		for (GameObject go : objects) {
+		for (Candy go : candies)
+		{
 			go.update();
 		}
+
 	}
 
 	@Override
@@ -143,25 +168,28 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void mouseClicked(MouseEvent e) {
-
+		guess = true;
 		blueCandy.mouseClicked(e);
 		greenCandy.mouseClicked(e);
 		orangeCandy.mouseClicked(e);
 		redCandy.mouseClicked(e);
+
 		if (index < randomNums.size()) {
 			if (latestID == randomNums.get(index)) {
-				guess = true;
+				highlightColor = Color.GREEN;
 				index++;
 				System.out.println("correct candy clicked");
 				if (index == randomNums.size()) {
 					System.out.println("adding number");
 					randomNums.add(new Random().nextInt(4));
-					currentPhase = displayPhase;//switches to display phase before it makes last clicked candy green
+					currentPhase = displayPhase;// switches to display phase
+												// before it makes last clicked
+												// candy green
 					index = 0;
 					guess = false;
 				}
 			} else {
-				guess = false;
+				highlightColor = Color.RED;
 				System.out.println("wrong candy clicked");
 			}
 
