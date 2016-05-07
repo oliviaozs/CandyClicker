@@ -36,7 +36,7 @@ public class Candy extends JButton {
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		if (e.getX() > x && e.getX() < (x + width) && e.getY() > y && e.getY() < (y + height)) {
+		if (e.getX() > (x-50) && e.getX() < (x + width+50) && e.getY() > (y-50) && e.getY() < (y + height+50)) {
 			GamePanel.latestID = id;
 		}
 

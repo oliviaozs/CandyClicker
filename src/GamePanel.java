@@ -10,14 +10,15 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.colorchooser.ColorSelectionModel;
 
 public class GamePanel extends JPanel implements ActionListener {
 	Timer t;
-	Color randomColor;
 	Color highlightColor;
+	Color randomColor;
 	public static int latestID;
 	int random;
 	int highlightedCandy;
@@ -28,7 +29,12 @@ public class GamePanel extends JPanel implements ActionListener {
 	int displayPhase = 0;
 	int inputPhase = 1;
 	int currentPhase = displayPhase;
-	boolean guess = false;
+	int waitTime = 800;
+	int lastSelected = -1;
+	int numWrong = 0;
+
+	SoundPlayer correctSound;
+	SoundPlayer wrongSound;
 
 	BufferedImage blueImage;
 	BufferedImage greenImage;
@@ -48,24 +54,28 @@ public class GamePanel extends JPanel implements ActionListener {
 		random = new Random().nextInt(4);
 		randomNums.add(random);
 		highlightedCandy = random;
-		random = new Random().nextInt(4);
-		randomNums.add(random);
-		random = new Random().nextInt(4);
-		randomNums.add(random);
+		//random = new Random().nextInt(4);
+		//randomNums.add(random);
+		//random = new Random().nextInt(4);
+		//randomNums.add(random);
+		randomColor = Utilities.getRandomColor();
 
 		try {
 			blueImage = ImageIO.read(this.getClass().getResourceAsStream("blue.png"));
 			greenImage = ImageIO.read(this.getClass().getResourceAsStream("green.png"));
 			orangeImage = ImageIO.read(this.getClass().getResourceAsStream("orange.png"));
 			redImage = ImageIO.read(this.getClass().getResourceAsStream("red.png"));
+
+			correctSound = new SoundPlayer("correct.wav");
+			wrongSound = new SoundPlayer("wrong.wav");
 		} catch (Exception e) {
 			System.out.println("ERROR");
 		}
 
 		greenCandy = new Candy(50, 50, 150, 150, greenImage, 0);
 		blueCandy = new Candy(300, 50, 150, 150, blueImage, 1);
-		orangeCandy = new Candy(50, 250, 150, 150, orangeImage, 2);
-		redCandy = new Candy(300, 250, 150, 150, redImage, 3);
+		orangeCandy = new Candy(50, 300, 150, 150, orangeImage, 2);
+		redCandy = new Candy(300, 300, 150, 150, redImage, 3);
 
 		candies = new ArrayList<Candy>();
 		candies.add(greenCandy);
@@ -91,17 +101,15 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 
 		} else if (currentPhase == inputPhase) {
-			if (guess) {
-				g.setColor(highlightColor);
-				if (highlightedCandy == 0) {
-					g.fillRect(0, 0, 250, 250);
-				} else if (highlightedCandy == 1) {
-					g.fillRect(250, 0, 250, 250);
-				} else if (highlightedCandy == 2) {
-					g.fillRect(0, 250, 250, 250);
-				} else if (highlightedCandy == 3) {
-					g.fillRect(250, 250, 250, 250);
-				}
+			g.setColor(highlightColor);
+			if (highlightedCandy == 0) {
+				g.fillRect(0, 0, 250, 250);
+			} else if (highlightedCandy == 1) {
+				g.fillRect(250, 0, 250, 250);
+			} else if (highlightedCandy == 2) {
+				g.fillRect(0, 250, 250, 250);
+			} else if (highlightedCandy == 3) {
+				g.fillRect(250, 250, 250, 250);
 			}
 
 		}
@@ -118,44 +126,24 @@ public class GamePanel extends JPanel implements ActionListener {
 				startTime = System.currentTimeMillis();
 
 			}
-			if (System.currentTimeMillis() - startTime >= 800) {
+			if (System.currentTimeMillis() - startTime >= waitTime) {
 				if (counter < randomNums.size()) {
-
 					randomColor = Utilities.getRandomColor();
 					highlightedCandy = randomNums.get(counter++);
 					startTime = -1;
 				} else {
 					currentPhase = inputPhase;
 					counter = 0;
+					highlightedCandy = -1;
+					latestID = -1;
 
 				}
 			}
 		} else if (currentPhase == inputPhase) {
-
-			/*if (startTime == -1) {
-				startTime = System.currentTimeMillis();
-			}
-			if (System.currentTimeMillis() - startTime >= 1000) {
-				highlightedCandy = -1;
-				startTime = -1;
-				if (index >= randomNums.size()) {
-					currentPhase = displayPhase;
-					index = 0;
-				}
-				if (guess) {
-					if (index < randomNums.size()) {
-						highlightedCandy = latestID;
-						startTime = -1;
-					}
-				}
-			}*/
-
 			highlightedCandy = latestID;
-
 		}
 
-		for (Candy go : candies)
-		{
+		for (Candy go : candies) {
 			go.update();
 		}
 
@@ -168,7 +156,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		guess = true;
 		blueCandy.mouseClicked(e);
 		greenCandy.mouseClicked(e);
 		orangeCandy.mouseClicked(e);
@@ -176,21 +163,30 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		if (index < randomNums.size()) {
 			if (latestID == randomNums.get(index)) {
+				correctSound.run();
 				highlightColor = Color.GREEN;
 				index++;
 				System.out.println("correct candy clicked");
 				if (index == randomNums.size()) {
+					if (randomNums.size() % 5 == 0) {
+						waitTime -= 75;
+					}
 					System.out.println("adding number");
 					randomNums.add(new Random().nextInt(4));
-					currentPhase = displayPhase;// switches to display phase
-												// before it makes last clicked
-												// candy green
+					currentPhase = displayPhase;
 					index = 0;
-					guess = false;
 				}
 			} else {
-				highlightColor = Color.RED;
-				System.out.println("wrong candy clicked");
+				numWrong++;
+				if (numWrong == 3) {
+					GameWindow.lose(randomNums.size()-1);
+				} else {
+					wrongSound.run();
+					//highlightColor = Color.RED;
+					System.out.println("wrong candy clicked");
+					currentPhase = displayPhase;
+					index = 0;
+				}
 			}
 
 		}

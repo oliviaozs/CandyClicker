@@ -2,15 +2,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class GameWindow implements MouseListener {
-	JFrame frame;
+	static JFrame frame;
 	GamePanel panel;
 
 	public static void main(String[] args) {
 		GameWindow w = new GameWindow();
+		JOptionPane.showMessageDialog(null, "your goal: repeat the pattern\nif you miss more than three times, you lose!");
 		w.createUI();
-
 	}
 
 	public void createUI() {
@@ -21,6 +22,11 @@ public class GameWindow implements MouseListener {
 		frame.setSize(500, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+	}
+	
+	public static void lose(int score){
+		frame.setVisible(false);
+		JOptionPane.showMessageDialog(null, "you lose!\nyour score: "+score);
 	}
 
 	@Override
