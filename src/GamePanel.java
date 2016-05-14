@@ -187,7 +187,13 @@ public class GamePanel extends JPanel implements ActionListener {
 							go.setY(300);
 						}
 					}
-					if (index == randomNums.size()){
+					if (index == randomNums.size()) {
+						if (randomNums.size() % 5 == 0) {
+							waitTime -= 75;
+						}
+						levelUp.run();
+						System.out.println("adding number");
+						randomNums.add(new Random().nextInt(4));
 						currentPhase = displayPhase;
 						index = 0;
 					}
@@ -218,16 +224,16 @@ public class GamePanel extends JPanel implements ActionListener {
 				highlightColor = Color.GREEN;
 				index++;
 				System.out.println("correct candy clicked");
-				if (index == randomNums.size()) {
+				/*if (index == randomNums.size()) {
 					if (randomNums.size() % 5 == 0) {
 						waitTime -= 75;
 					}
 					levelUp.run();
 					System.out.println("adding number");
 					randomNums.add(new Random().nextInt(4));
-					//currentPhase = displayPhase;
-					//index = 0;
-				}
+					currentPhase = displayPhase;
+					index = 0;
+				}*/
 			} else {
 				numWrong++;
 				if (numWrong == 3) {
