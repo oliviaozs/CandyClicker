@@ -191,7 +191,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if (randomNums.size() % 5 == 0) {
 							waitTime -= 75;
 						}
-						levelUp.run();
+						new Thread(new SoundPlayer("levelup.wav")).start();
 						System.out.println("adding number");
 						randomNums.add(new Random().nextInt(4));
 						currentPhase = displayPhase;
@@ -220,7 +220,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		if (index < randomNums.size() && register) {
 			if (latestID == randomNums.get(index)) {
-				correctSound.run();
+				new Thread(new SoundPlayer("correct.wav")).start();
 				highlightColor = Color.GREEN;
 				index++;
 				System.out.println("correct candy clicked");
@@ -239,7 +239,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				if (numWrong == 3) {
 					GameWindow.lose(randomNums.size()-1);
 				} else {
-					wrongSound.run();
+					new Thread(new SoundPlayer("wrong.wav")).start();
 					System.out.println("wrong candy clicked");
 					currentPhase = displayPhase;
 					index = 0;
