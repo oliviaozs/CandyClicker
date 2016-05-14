@@ -30,6 +30,21 @@ public class Candy extends JButton {
 	public void update() {
 
 	}
+	
+	public void setX(int x){
+		this.x = x;
+	}
+	public void setY(int y){
+		this.y = y;
+	}
+	
+	public void setWidth(int w){
+		this.width = w;
+	}
+	
+	public void setHeight(int h){
+		this.height = h;
+	}
 
 	public void paintComponent(Graphics g) {
 		g.drawImage(picture, x, y, width, height, null);

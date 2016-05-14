@@ -32,9 +32,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	int waitTime = 800;
 	int lastSelected = -1;
 	int numWrong = 0;
+	boolean register = true;
 
 	SoundPlayer correctSound;
 	SoundPlayer wrongSound;
+	SoundPlayer levelUp;
 
 	BufferedImage blueImage;
 	BufferedImage greenImage;
@@ -54,10 +56,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		random = new Random().nextInt(4);
 		randomNums.add(random);
 		highlightedCandy = random;
-		//random = new Random().nextInt(4);
-		//randomNums.add(random);
-		//random = new Random().nextInt(4);
-		//randomNums.add(random);
 		randomColor = Utilities.getRandomColor();
 
 		try {
@@ -68,6 +66,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 			correctSound = new SoundPlayer("correct.wav");
 			wrongSound = new SoundPlayer("wrong.wav");
+			levelUp = new SoundPlayer("levelup.wav");
 		} catch (Exception e) {
 			System.out.println("ERROR");
 		}
@@ -90,29 +89,34 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void paintComponent(Graphics g) {
 		if (currentPhase == displayPhase) {
 			g.setColor(randomColor);
-			if (highlightedCandy == 0) {
-				g.fillRect(0, 0, 250, 250);
-			} else if (highlightedCandy == 1) {
-				g.fillRect(250, 0, 250, 250);
-			} else if (highlightedCandy == 2) {
-				g.fillRect(0, 250, 250, 250);
-			} else if (highlightedCandy == 3) {
-				g.fillRect(250, 250, 250, 250);
-			}
-
-		} else if (currentPhase == inputPhase) {
+		} else if (currentPhase == inputPhase){
 			g.setColor(highlightColor);
+		}
 			if (highlightedCandy == 0) {
+				greenCandy.setWidth(200);
+				greenCandy.setHeight(200);
+				greenCandy.setX(25);
+				greenCandy.setY(25);
 				g.fillRect(0, 0, 250, 250);
 			} else if (highlightedCandy == 1) {
+				blueCandy.setWidth(200);
+				blueCandy.setHeight(200);
+				blueCandy.setX(275);
+				blueCandy.setY(25);
 				g.fillRect(250, 0, 250, 250);
 			} else if (highlightedCandy == 2) {
+				orangeCandy.setWidth(200);
+				orangeCandy.setHeight(200);
+				orangeCandy.setX(25);
+				orangeCandy.setY(275);
 				g.fillRect(0, 250, 250, 250);
 			} else if (highlightedCandy == 3) {
+				redCandy.setWidth(200);
+				redCandy.setHeight(200);
+				redCandy.setX(275);
+				redCandy.setY(275);
 				g.fillRect(250, 250, 250, 250);
 			}
-
-		}
 
 		for (Candy go : candies) {
 			go.paintComponent(g);
@@ -127,20 +131,67 @@ public class GamePanel extends JPanel implements ActionListener {
 
 			}
 			if (System.currentTimeMillis() - startTime >= waitTime) {
+				for (Candy go: candies) {
+					go.setWidth(150);
+					go.setHeight(150);
+					if (go.getID() == 0){
+						go.setX(50);
+						go.setY(50);
+					} else if (go.getID() == 1){
+						go.setX(300);
+						go.setY(50);
+					} else if (go.getID()==2){
+						go.setX(50);
+						go.setY(300);
+					} else if (go.getID() == 3){
+						go.setX(300);
+						go.setY(300);
+					}
+				}
+				startTime = -1;
 				if (counter < randomNums.size()) {
 					randomColor = Utilities.getRandomColor();
 					highlightedCandy = randomNums.get(counter++);
-					startTime = -1;
 				} else {
 					currentPhase = inputPhase;
 					counter = 0;
 					highlightedCandy = -1;
 					latestID = -1;
-
 				}
 			}
 		} else if (currentPhase == inputPhase) {
-			highlightedCandy = latestID;
+			if (startTime == -1 && latestID !=-1) {
+				startTime = System.currentTimeMillis();
+				highlightedCandy = latestID;
+				register = false;
+			} 
+			if (System.currentTimeMillis() - startTime >= 700) {
+					register = true;
+					latestID = -1;
+					startTime = -1;
+					highlightedCandy = latestID;
+					for (Candy go: candies) {
+						go.setWidth(150);
+						go.setHeight(150);
+						if (go.getID() == 0){
+							go.setX(50);
+							go.setY(50);
+						} else if (go.getID() == 1){
+							go.setX(300);
+							go.setY(50);
+						} else if (go.getID()==2){
+							go.setX(50);
+							go.setY(300);
+						} else if (go.getID() == 3){
+							go.setX(300);
+							go.setY(300);
+						}
+					}
+					if (index == randomNums.size()){
+						currentPhase = displayPhase;
+						index = 0;
+					}
+			}
 		}
 
 		for (Candy go : candies) {
@@ -161,7 +212,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		orangeCandy.mouseClicked(e);
 		redCandy.mouseClicked(e);
 
-		if (index < randomNums.size()) {
+		if (index < randomNums.size() && register) {
 			if (latestID == randomNums.get(index)) {
 				correctSound.run();
 				highlightColor = Color.GREEN;
@@ -171,10 +222,11 @@ public class GamePanel extends JPanel implements ActionListener {
 					if (randomNums.size() % 5 == 0) {
 						waitTime -= 75;
 					}
+					levelUp.run();
 					System.out.println("adding number");
 					randomNums.add(new Random().nextInt(4));
-					currentPhase = displayPhase;
-					index = 0;
+					//currentPhase = displayPhase;
+					//index = 0;
 				}
 			} else {
 				numWrong++;
@@ -182,7 +234,6 @@ public class GamePanel extends JPanel implements ActionListener {
 					GameWindow.lose(randomNums.size()-1);
 				} else {
 					wrongSound.run();
-					//highlightColor = Color.RED;
 					System.out.println("wrong candy clicked");
 					currentPhase = displayPhase;
 					index = 0;
