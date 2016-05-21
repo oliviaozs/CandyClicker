@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,8 +32,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	int currentPhase = displayPhase;
 	int waitTime = 800;
 	int lastSelected = -1;
-	int numWrong = 0;
+	int numWrong = 3;
 	boolean register = true;
+	boolean correct;
+	
+	JButton repeatPattern;
 
 	SoundPlayer correctSound;
 	SoundPlayer wrongSound;
@@ -121,11 +125,16 @@ public class GamePanel extends JPanel implements ActionListener {
 		for (Candy go : candies) {
 			go.paintComponent(g);
 		}
+		
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Helvetica", Font.PLAIN, 18));
+		g.drawString("Score: "+(randomNums.size()-1)+"\nLives: "+numWrong, 180, 40);
 	}
 
 	public void update() {
 		if (currentPhase == displayPhase) {
-
+			register = false;
+			correct = true;
 			if (startTime == -1) {
 				startTime = System.currentTimeMillis();
 
@@ -165,7 +174,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				highlightedCandy = latestID;
 				register = false;
 			} 
-			if (System.currentTimeMillis() - startTime >= 700) {
+			if (System.currentTimeMillis() - startTime >= 450) {
 					register = true;
 					latestID = -1;
 					startTime = -1;
@@ -187,6 +196,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							go.setY(300);
 						}
 					}
+					
 					if (index == randomNums.size()) {
 						if (randomNums.size() % 5 == 0) {
 							waitTime -= 75;
@@ -197,6 +207,11 @@ public class GamePanel extends JPanel implements ActionListener {
 						currentPhase = displayPhase;
 						index = 0;
 					}
+					if (correct == false){
+						currentPhase = displayPhase;
+					}
+					
+					
 			}
 		}
 
@@ -220,28 +235,21 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		if (index < randomNums.size() && register) {
 			if (latestID == randomNums.get(index)) {
+				correct = true;
 				new Thread(new SoundPlayer("correct.wav")).start();
 				highlightColor = Color.GREEN;
 				index++;
 				System.out.println("correct candy clicked");
-				/*if (index == randomNums.size()) {
-					if (randomNums.size() % 5 == 0) {
-						waitTime -= 75;
-					}
-					levelUp.run();
-					System.out.println("adding number");
-					randomNums.add(new Random().nextInt(4));
-					currentPhase = displayPhase;
-					index = 0;
-				}*/
 			} else {
-				numWrong++;
-				if (numWrong == 3) {
+				correct = false;
+				numWrong--;
+				if (numWrong == 0) {
 					GameWindow.lose(randomNums.size()-1);
 				} else {
 					new Thread(new SoundPlayer("wrong.wav")).start();
 					System.out.println("wrong candy clicked");
-					currentPhase = displayPhase;
+					highlightColor = Color.RED;
+					//currentPhase = displayPhase;
 					index = 0;
 				}
 			}
