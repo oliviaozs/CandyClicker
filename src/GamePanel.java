@@ -46,6 +46,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	BufferedImage greenImage;
 	BufferedImage orangeImage;
 	BufferedImage redImage;
+	BufferedImage backgroundImage;
 
 	Candy greenCandy;
 	Candy blueCandy;
@@ -67,6 +68,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			greenImage = ImageIO.read(this.getClass().getResourceAsStream("green.png"));
 			orangeImage = ImageIO.read(this.getClass().getResourceAsStream("orange.png"));
 			redImage = ImageIO.read(this.getClass().getResourceAsStream("red.png"));
+			backgroundImage = ImageIO.read(this.getClass().getResourceAsStream("background.jpg"));
 
 			correctSound = new SoundPlayer("correct.wav");
 			wrongSound = new SoundPlayer("wrong.wav");
@@ -91,6 +93,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void paintComponent(Graphics g) {
+		g.drawImage(backgroundImage, 0, 0, 500, 500, null);
 		if (currentPhase == displayPhase) {
 			g.setColor(randomColor);
 		} else if (currentPhase == inputPhase){
@@ -132,6 +135,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void update() {
+		
 		if (currentPhase == displayPhase) {
 			register = false;
 			correct = true;
