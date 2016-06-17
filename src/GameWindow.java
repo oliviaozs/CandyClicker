@@ -13,46 +13,27 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class GameWindow implements MouseListener, ActionListener {
-	static JFrame gameFrame;
-	JFrame startFrame;
-	JPanel startPanel;
+	static JFrame frame;
 	GamePanel panel;
-	JButton instructions;
-	JButton startGame;
 
 	public static void main(String[] args) {
 		GameWindow w = new GameWindow();
-		w.start();
+		JOptionPane.showMessageDialog(null, "Your goal:\nRepeat the pattern.\nIf you miss more than three times, you lose!");
+		w.createUI();
 	}
 
 	public void createUI() {
-		gameFrame = new JFrame("Candy Clicker");
-		gameFrame.addMouseListener(this);
+		frame = new JFrame("Candy Clicker");
+		frame.setSize(500,500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addMouseListener(this);
 		panel = new GamePanel();
-		gameFrame.add(panel);
-		gameFrame.setSize(500, 500);
-		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		gameFrame.setVisible(true);
-	}
-	
-	public void start(){
-		startFrame = new JFrame("Candy Clicker");
-		startFrame.setSize(500, 500);
-		startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		startPanel = new JPanel();
-		instructions = new JButton("Instructions");
-		instructions.addActionListener(this);
-		startGame = new JButton("Start Game");
-		startGame.addActionListener(this);
-		startPanel.add(startGame);
-		startPanel.add(instructions);
-		startFrame.add(startPanel);
-		startPanel.setBackground(Color.ORANGE);
-		startFrame.setVisible(true);
+		frame.add(panel);
+		frame.setVisible(true);
 	}
 	
 	public static void lose(int score){
-		gameFrame.dispose();
+		frame.dispose();
 		JOptionPane.showMessageDialog(null, "You lose!\nYour score: "+score);
 	}
 
@@ -87,12 +68,6 @@ public class GameWindow implements MouseListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if ((JButton) e.getSource() == instructions){
-			JOptionPane.showMessageDialog(null, "Your goal:\nRepeat the pattern.\nIf you miss more than three times, you lose!");
-		} else if ((JButton) e.getSource() == startGame){
-			startFrame.dispose();
-			createUI();
-		}
 		
 	}
 
